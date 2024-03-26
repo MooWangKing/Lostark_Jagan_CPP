@@ -97,3 +97,6 @@ Plugins/**/Intermediate/*
 LostarkJaganCPP/Binaries/*
 LostarkJaganCPP/Intermediate/*
 LostarkJaganCPP/Saved/*
+
+# Rider
+*.idea
