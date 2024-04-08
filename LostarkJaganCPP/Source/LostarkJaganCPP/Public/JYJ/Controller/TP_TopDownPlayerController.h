@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -42,6 +42,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* SetDestinationTouchAction;
 
+	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
+	UInputAction* SetDashClickAction;
+
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
@@ -61,8 +64,14 @@ protected:
 private:
 	FVector CachedDestination;
 
+	FHitResult Hit;
 	bool bIsTouch; // Is it a touch device
 	float FollowTime; // For how long it has been pressed
+
+private:
+	/** Dash */
+	FVector DashVec;
+	void OnInputDashStarted();
 };
 
 

@@ -10,6 +10,8 @@
 #include "InputActionValue.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
+#include "JYJ/Player/ElementalPlayer.h"
+#include "Kismet/KismetMathLibrary.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -52,6 +54,9 @@ void ATP_TopDownPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Triggered, this, &ATP_TopDownPlayerController::OnTouchTriggered);
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Completed, this, &ATP_TopDownPlayerController::OnTouchReleased);
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Canceled, this, &ATP_TopDownPlayerController::OnTouchReleased);
+
+		// Setup Dash Input Event
+		EnhancedInputComponent->BindAction( SetDashClickAction , ETriggerEvent::Started , this , &ATP_TopDownPlayerController::OnInputDashStarted );
 	}
 	else
 	{
@@ -71,7 +76,7 @@ void ATP_TopDownPlayerController::OnSetDestinationTriggered()
 	FollowTime += GetWorld()->GetDeltaSeconds();
 	
 	// We look for the location in the world where the player has pressed the input
-	FHitResult Hit;
+	//FHitResult Hit;
 	bool bHitSuccessful = false;
 	if (bIsTouch)
 	{
@@ -121,4 +126,21 @@ void ATP_TopDownPlayerController::OnTouchReleased()
 {
 	bIsTouch = false;
 	OnSetDestinationReleased();
+}
+
+void ATP_TopDownPlayerController::OnInputDashStarted()
+{
+	bool bHitSuccessful = false;
+	AElementalPlayer* player = Cast<AElementalPlayer>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+
+	bHitSuccessful = GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursor( ECC_Visibility , true , Hit );
+
+	if(bHitSuccessful)
+	{
+		DashVec = Hit.ImpactPoint - GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+		player->LaunchCharacter( DashVec.GetSafeNormal() * 10000 , false, false);
+		player->SetActorRotation( UKismetMathLibrary::MakeRotFromXZ( DashVec , player->GetActorUpVector() ) );
+	}
+
+
 }
